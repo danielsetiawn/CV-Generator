@@ -1,0 +1,75 @@
+{
+  "profile": {
+    "name": "Ari Pratama",
+    "location": "Jakarta, Indonesia",
+    "email": "ari.pratama@email.com",
+    "phone": "+62 812 3456 7890",
+    "linkedin": "linkedin.com/in/aripratama",
+    "website": "github.com/aripratama"
+  },
+  "section_order": ["education", "experience", "projects", "leadership", "skills"],
+  "education": [
+    {
+      "school": "Harvard University",
+      "location": "Cambridge, MA",
+      "degree": "Bachelor of Arts in Computer Science",
+      "concentration": "Data Science track",
+      "gpa": "3.8/4.0",
+      "graduation_date": "May 2026",
+      "relevant_coursework": ["Algorithms", "Databases", "Machine Learning", "Software Engineering"]
+    }
+  ],
+  "experience": [
+    {
+      "organization": "Nusantara Analytics",
+      "location": "Jakarta, Indonesia",
+      "title": "Data Analyst Intern",
+      "dates": "June 2025 - August 2025",
+      "bullets": [
+        "Analyzed 120K customer records with SQL and Python to identify retention patterns across three product lines",
+        "Built automated dashboard for weekly funnel reporting, reducing manual reporting time by 6 hours per week",
+        "Collaborated with product managers to define KPI taxonomy used in executive performance reviews"
+      ]
+    },
+    {
+      "organization": "Campus Technology Office",
+      "location": "Cambridge, MA",
+      "title": "Software Engineering Assistant",
+      "dates": "September 2024 - May 2025",
+      "bullets": [
+        "Developed internal ticket triage tool in Python that improved average routing accuracy by 18%",
+        "Implemented unit tests for core service modules, increasing regression coverage across high-use workflows"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "organization": "ATS Resume Generator",
+      "location": "Remote",
+      "title": "Python Developer",
+      "dates": "2026",
+      "bullets": [
+        "Created DOCX generator using Harvard-style structure, real Word headings, and native bullet formatting",
+        "Designed JSON schema for reusable profile, education, experience, project, leadership, and skill sections"
+      ]
+    }
+  ],
+  "leadership": [
+    {
+      "organization": "Indonesian Student Association",
+      "location": "Cambridge, MA",
+      "title": "Events Coordinator",
+      "dates": "September 2024 - May 2025",
+      "bullets": [
+        "Led logistics for six cultural events serving 300+ students, alumni, and faculty guests",
+        "Managed vendor coordination and budget tracking for annual showcase delivered under budget"
+      ]
+    }
+  ],
+  "skills": {
+    "technical": ["Python", "SQL", "Excel", "Tableau", "Git"],
+    "language": ["Indonesian native", "English fluent"],
+    "tools": ["PowerPoint", "Google Workspace", "Notion"]
+  },
+  "interests": ["Badminton", "public speaking", "financial literacy"]
+}

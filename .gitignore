@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+env/
+node_modules/
+dist/
+.tmp/
+outputs/*.log
+outputs/*.docx
+!outputs/sample_cv.docx
