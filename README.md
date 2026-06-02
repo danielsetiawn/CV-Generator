@@ -1,61 +1,63 @@
 # Harvard ATS CV Generator
 
-Project React + Python untuk membuat CV/resume ATS-friendly dengan gaya template Harvard MCS. App web menyediakan form input, import CV lama, live output preview, ATS warning dasar, dan export ke `.docx` atau `.pdf`.
+A React + Python project for creating ATS-friendly CVs/resumes in the Harvard MCS style. The web app includes structured input forms, existing CV import, a live resume preview, basic ATS checks, and export to `.docx` or `.pdf`.
 
-## Isi project
+## Project Structure
 
-- `src/` - React app dengan form dan preview.
-- `server.mjs` - server Express untuk import resume, export DOCX, dan export PDF.
-- `generate_cv.py` - command line generator.
-- `import_resume.py` - parser PDF/DOCX untuk auto-fill data dari CV lama.
-- `ats_harvard_cv/` - modul utama pembuat DOCX.
-- `templates/Accessible-MCS-Resume-Template-Bullet-Points.docx` - template Harvard MCS yang dipakai sebagai dasar style.
-- `cv_data.example.json` - contoh data CV.
-- `outputs/` - folder hasil generate.
+- `src/` - React app with the form and live preview.
+- `server.mjs` - Express server for resume import, DOCX export, and PDF export.
+- `generate_cv.py` - command line CV generator.
+- `import_resume.py` - PDF/DOCX parser for auto-filling data from an existing CV.
+- `ats_harvard_cv/` - core DOCX generation module.
+- `templates/Accessible-MCS-Resume-Template-Bullet-Points.docx` - Harvard MCS template used as the style base.
+- `cv_data.example.json` - sample CV data.
+- `outputs/` - generated output files.
 
-## Cara run web app
+## Run the Web App
 
-1. Install dependency JavaScript dan Python:
+1. Install JavaScript and Python dependencies:
 
 ```bash
 npm install
 pip install -r requirements.txt
 ```
 
-2. Jalankan app:
+2. Start the app:
 
 ```bash
 npm run dev
 ```
 
-3. Buka:
+3. Open:
 
 ```text
 http://localhost:5173
 ```
 
-Isi form di kiri, lihat preview di kanan, lalu klik `DOCX` atau `PDF`.
+Fill in the form on the left, review the live preview on the right, then click `DOCX` or `PDF`.
 
-Jika Python tidak terdeteksi otomatis, set env `PYTHON` ke executable Python kamu sebelum menjalankan app.
+If Python is not detected automatically, set the `PYTHON` environment variable to your Python executable before starting the app.
 
-Fitur app:
+## Features
 
-- Autosave draft di browser, jadi reload tidak menghapus input.
-- Load dan download draft JSON.
-- Import CV lama dari PDF/DOCX untuk auto-fill form, lalu lengkapi field kosong secara manual.
-- Reset draft ke blank state.
-- ATS progress dan warning sebelum export.
-- Export DOCX/PDF hanya aktif saat warning dasar sudah beres.
-- Skill picker hybrid: pilih suggestion atau tambah skill custom.
+- Browser autosave, so refreshing the page does not remove your draft.
+- Load and download JSON drafts.
+- Import an existing PDF/DOCX CV to auto-fill the form, then manually complete any missing fields.
+- Reset the draft to a blank state.
+- Basic ATS progress and warnings before export.
+- DOCX/PDF export, available once the basic ATS warnings are resolved.
+- Hybrid skills picker: choose suggested skills or add custom skills.
 
-Export recommendation:
+## Export Recommendation
 
-- Gunakan `DOCX` sebagai default kalau CV masih perlu diedit atau dikirim ke sistem ATS yang minta Word.
-- Gunakan `PDF` untuk versi final yang layout-nya terkunci. PDF export membutuhkan LibreOffice/soffice di server; Dockerfile project ini sudah memasangnya untuk deploy container.
+- Use `DOCX` as the default when the resume still needs editing or when an ATS specifically requests a Word document.
+- Use `PDF` for the final submission version when the layout should stay locked.
 
-## Build dan deploy
+PDF export requires LibreOffice/soffice on the server. The included Dockerfile installs LibreOffice for container deployment.
 
-Build production:
+## Build and Deploy
+
+Production build:
 
 ```bash
 npm run build
@@ -69,49 +71,49 @@ docker build -t harvard-ats-cv-generator .
 docker run -p 5173:5173 harvard-ats-cv-generator
 ```
 
-Untuk platform seperti Render/Railway/Fly.io, gunakan Dockerfile yang sudah disediakan.
+For platforms such as Render, Railway, or Fly.io, use the included Dockerfile.
 
-## Cara pakai CLI lama
+## CLI Usage
 
-1. Install dependency:
+1. Install Python dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Ubah isi `cv_data.example.json` sesuai data kamu, atau buat file JSON baru.
+2. Edit `cv_data.example.json` with your own CV data, or create a new JSON file.
 
-3. Generate CV:
+3. Generate a CV:
 
 ```bash
 python generate_cv.py --data cv_data.example.json --output outputs/cv.docx
 ```
 
-4. Kalau mau generator gagal saat menemukan warning ATS:
+4. To make the generator fail when ATS warnings are found:
 
 ```bash
 python generate_cv.py --data cv_data.example.json --output outputs/cv.docx --strict
 ```
 
-## Format data
+## Data Format
 
-Field utama:
+Main fields:
 
-- `profile`: nama, lokasi, email, telepon, LinkedIn, website.
-- `education`: sekolah/kampus, degree, GPA, coursework, honors.
-- `experience`: organisasi, lokasi, title, tanggal, bullets.
-- `projects`: format sama seperti experience.
-- `leadership`: format sama seperti experience.
-- `skills`: kategori skill.
-- `interests`: daftar interest singkat.
+- `profile`: name, location, email, phone, LinkedIn, website.
+- `education`: school/university, degree, GPA, coursework, honors.
+- `experience`: organization, location, title, dates, bullets.
+- `projects`: same structure as experience.
+- `leadership`: same structure as experience.
+- `skills`: skill categories.
+- `interests`: short list of interests.
 
-Bullet yang bagus untuk ATS biasanya:
+Strong ATS-friendly bullets usually:
 
-- dimulai dengan action verb seperti `Analyzed`, `Built`, `Led`, `Improved`;
-- menyebut tools atau skill yang relevan;
-- punya angka/impact kalau memungkinkan;
-- tidak memakai kata ganti seperti `I`, `my`, atau `we`.
+- start with an action verb such as `Analyzed`, `Built`, `Led`, or `Improved`;
+- mention relevant tools or skills;
+- include numbers or measurable impact when possible;
+- avoid personal pronouns such as `I`, `my`, or `we`.
 
-## Catatan ATS
+## ATS Notes
 
-Generator ini sengaja memakai struktur sederhana: heading Word asli, bullet Word asli, teks biasa, tanpa text box, ikon, grafik, atau kolom kompleks. Posisi kanan untuk lokasi dan tanggal dibuat dengan tab stop, bukan layout visual yang berat.
+The generator intentionally uses a simple structure: real Word headings, real Word bullets, plain text, no text boxes, no icons, no graphics, and no complex columns. Right-aligned locations and dates are created with tab stops instead of heavy visual layout elements.
