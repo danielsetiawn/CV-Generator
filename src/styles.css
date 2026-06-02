@@ -176,7 +176,8 @@ button {
 }
 
 .preview-panel {
-  overflow: auto;
+  container-type: inline-size;
+  overflow: hidden;
 }
 
 .form-panel {
@@ -632,15 +633,16 @@ button {
 
 .resume-paper {
   background: white;
-  width: 612px;
-  max-width: none;
-  min-height: 792px;
+  width: min(100%, 612px);
+  max-width: 100%;
+  min-height: 0;
+  aspect-ratio: 8.5 / 11;
   margin: 0 auto;
-  padding: 36px;
+  padding: clamp(18px, 5.88cqw, 36px);
   border: 2px solid rgba(37, 37, 31, 0.84);
   box-shadow: 8px 8px 0 rgba(99, 107, 70, 0.18);
   font-family: Calibri, Arial, sans-serif;
-  font-size: 14px;
+  font-size: clamp(9px, 2.29cqw, 14px);
   color: #111;
   overflow: hidden;
 }
@@ -651,28 +653,28 @@ button {
 }
 
 .resume-paper h2 {
-  margin: 0 0 2.7px;
-  font-size: 21.33px;
+  margin: 0 0 0.19em;
+  font-size: clamp(13.8px, 3.49cqw, 21.33px);
   font-weight: 700;
   line-height: 1.05;
 }
 
 .resume-paper header p {
   margin: 0;
-  font-size: 14px;
+  font-size: inherit;
   line-height: 1.08;
   overflow-wrap: anywhere;
 }
 
 .preview-section {
-  margin-top: 9.33px;
+  margin-top: 0.67em;
 }
 
 .preview-section h3 {
-  margin: 0 0 2.67px;
+  margin: 0 0 0.18em;
   padding-bottom: 1px;
   border-bottom: 1px solid #111;
-  font-size: 14.67px;
+  font-size: clamp(9.4px, 2.4cqw, 14.67px);
   font-weight: 700;
   line-height: 1.05;
   text-transform: none;
@@ -680,13 +682,13 @@ button {
 
 .preview-entry {
   margin-bottom: 0;
-  font-size: 14px;
+  font-size: inherit;
 }
 
 .preview-row {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 0.86em;
   line-height: 1.08;
 }
 
@@ -719,7 +721,7 @@ button {
 }
 
 .resume-paper ul {
-  margin: 0 0 0 24px;
+  margin: 0 0 0 1.7em;
   padding: 0;
 }
 
@@ -930,11 +932,6 @@ button {
   .export-actions {
     width: 100%;
     justify-content: flex-start;
-  }
-
-  .resume-paper {
-    width: 612px;
-    padding: 36px;
   }
 
   .preview-row {
