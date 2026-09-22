@@ -110,7 +110,7 @@ function App() {
   const resumeFileInputRef = React.useRef(null);
   const exportData = React.useMemo(() => sanitizeCvData(cv), [cv]);
   const warnings = React.useMemo(() => getAtsWarnings(exportData), [exportData]);
-  const exportDisabled = exportState.status === "loading" || warnings.length > 0;
+  const exportDisabled = exportState.status === "loading";
 
   React.useEffect(() => {
     try {
@@ -242,10 +242,6 @@ function App() {
   };
 
   const exportResume = async (format = "docx") => {
-    if (warnings.length > 0) {
-      setExportState({ status: "error", message: "Fix ATS warnings before exporting." });
-      return;
-    }
     const normalizedFormat = format === "pdf" ? "pdf" : "docx";
     const label = normalizedFormat.toUpperCase();
     setExportState({ status: "loading", message: `Preparing ${label}...` });

@@ -344,7 +344,7 @@ def _set_style(doc: Document, name: str, size: float, bold: bool | None = None) 
 
 
 def _add_profile(doc: Document, profile: dict[str, Any]) -> None:
-    name = _required_text(profile, "name", "profile")
+    name = str(profile.get("name") or "Your Name").strip()
     name_para = doc.add_paragraph(style="Heading 1")
     _set_paragraph_layout(name_para, alignment=WD_ALIGN_PARAGRAPH.CENTER, space_before=0, space_after=2)
     name_run = name_para.add_run(name)
@@ -370,14 +370,21 @@ def _add_education(doc: Document, items: Any) -> None:
         return
     _section_heading(doc, "Education")
     for item in entries:
-        school = _required_text(item, "school", "education")
-        location = item.get("location", "")
-        degree = _required_text(item, "degree", "education")
-        date = item.get("graduation_date") or item.get("dates") or ""
+        school = str(item.get("school") or "").strip()
+        location = str(item.get("location") or "").strip()
+        degree = str(item.get("degree") or "").strip()
+        date = str(item.get("graduation_date") or item.get("dates") or "").strip()
         detail_parts = [item.get("concentration"), _prefix("GPA", item.get("gpa"))]
 
-        _tabbed_line(doc, school, location, bold_left=True, bold_right=True)
-        _tabbed_line(doc, _join_sentence_parts([degree, *detail_parts]), date, italic_left=True)
+        if not school and not degree and not item.get("bullets"):
+            continue
+
+        if school or location:
+            _tabbed_line(doc, school or degree, location, bold_left=True, bold_right=True)
+            if school and (degree or any(detail_parts) or date):
+                _tabbed_line(doc, _join_sentence_parts([degree, *detail_parts]), date, italic_left=True)
+        elif degree or date or any(detail_parts):
+            _tabbed_line(doc, _join_sentence_parts([degree, *detail_parts]), date, italic_left=True)
 
         for label in ("thesis", "relevant_coursework", "honors"):
             value = item.get(label)
@@ -392,14 +399,20 @@ def _add_experience_section(doc: Document, title: str, items: Any) -> None:
         return
     _section_heading(doc, title)
     for item in entries:
-        organization = _required_text(item, "organization", title.lower())
-        location = item.get("location", "")
-        role = _required_text(item, "title", title.lower())
-        dates = item.get("dates", "")
+        organization = str(item.get("organization") or "").strip()
+        location = str(item.get("location") or "").strip()
+        role = str(item.get("title") or "").strip()
+        dates = str(item.get("dates") or "").strip()
+        bullets = item.get("bullets", [])
 
-        _tabbed_line(doc, organization, location, bold_left=True, bold_right=True)
-        _tabbed_line(doc, role, dates, italic_left=True)
-        _bullets(doc, item.get("bullets", []))
+        if not organization and not role and not bullets:
+            continue
+
+        if organization or location:
+            _tabbed_line(doc, organization, location, bold_left=True, bold_right=True)
+        if role or dates:
+            _tabbed_line(doc, role, dates, italic_left=True)
+        _bullets(doc, bullets)
 
 
 def _add_skills(doc: Document, skills: Any, interests: Any = None) -> None:
@@ -480,7 +493,7 @@ def _default_section_order(data: dict[str, Any]) -> list[str]:
 def _require_mapping(data: dict[str, Any], key: str) -> dict[str, Any]:
     value = data.get(key)
     if not isinstance(value, dict):
-        raise CVGeneratorError(f"Missing object: {key}")
+        return {}
     return value
 
 
