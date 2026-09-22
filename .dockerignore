@@ -3,6 +3,6 @@ dist
 .tmp
 __pycache__
 *.pyc
-outputs/*.docx
+outputs/*
 !outputs/sample_cv.docx
 .git

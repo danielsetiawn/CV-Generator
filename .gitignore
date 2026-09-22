@@ -5,6 +5,5 @@ env/
 node_modules/
 dist/
 .tmp/
-outputs/*.log
-outputs/*.docx
+outputs/*
 !outputs/sample_cv.docx

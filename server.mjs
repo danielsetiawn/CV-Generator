@@ -147,7 +147,7 @@ function handleResumeUpload(req, res, next) {
 async function generateDocx(payload, dataPath, outputPath) {
   await fs.mkdir(path.dirname(dataPath), { recursive: true });
   await fs.writeFile(dataPath, JSON.stringify(payload, null, 2), "utf8");
-  await runPython(["generate_cv.py", "--data", dataPath, "--output", outputPath, "--strict"]);
+  await runPython(["generate_cv.py", "--data", dataPath, "--output", outputPath]);
 }
 
 function runPython(args) {
@@ -220,19 +220,6 @@ function getOfficeExecutable() {
 function getPythonExecutable() {
   if (process.env.PYTHON || process.env.PYTHON_EXECUTABLE) {
     return process.env.PYTHON || process.env.PYTHON_EXECUTABLE;
-  }
-
-  const localBundledPython = path.join(
-    process.env.USERPROFILE || "",
-    ".cache",
-    "codex-runtimes",
-    "codex-primary-runtime",
-    "dependencies",
-    "python",
-    "python.exe",
-  );
-  if (existsSync(localBundledPython)) {
-    return localBundledPython;
   }
 
   return process.platform === "win32" ? "python" : "python3";
