@@ -896,6 +896,11 @@ function ResumePreview({ cv }) {
     previewValue(cv.profile.website, "Portfolio / GitHub"),
   ];
 
+  const education = React.useMemo(() => sortByTimelineDesc(cv.education || []), [cv.education]);
+  const experience = React.useMemo(() => sortByTimelineDesc(cv.experience || []), [cv.experience]);
+  const projects = React.useMemo(() => sortByTimelineDesc(cv.projects || []), [cv.projects]);
+  const leadership = React.useMemo(() => sortByTimelineDesc(cv.leadership || []), [cv.leadership]);
+
   return (
     <article className="resume-paper">
       <header>
@@ -910,7 +915,7 @@ function ResumePreview({ cv }) {
         </p>
       </header>
       <PreviewSection title="Education">
-        {cv.education.map((item, index) => (
+        {education.map((item, index) => (
           <PreviewEntry
             key={`preview-education-${index}`}
             topLeft={previewValue(item.school, "University / School Name")}
@@ -933,13 +938,13 @@ function ResumePreview({ cv }) {
         ))}
       </PreviewSection>
       <PreviewSection title="Experience">
-        {cv.experience.map((item, index) => <PreviewEntry key={`preview-exp-${index}`} {...previewProps(item, "Organization")} />)}
+        {experience.map((item, index) => <PreviewEntry key={`preview-exp-${index}`} {...previewProps(item, "Organization")} />)}
       </PreviewSection>
       <PreviewSection title="Projects">
-        {cv.projects.map((item, index) => <PreviewEntry key={`preview-project-${index}`} {...previewProps(item, "Project Name")} />)}
+        {projects.map((item, index) => <PreviewEntry key={`preview-project-${index}`} {...previewProps(item, "Project Name")} />)}
       </PreviewSection>
       <PreviewSection title="Leadership & Activities">
-        {cv.leadership.map((item, index) => <PreviewEntry key={`preview-leadership-${index}`} {...previewProps(item, "Organization / Activity")} />)}
+        {leadership.map((item, index) => <PreviewEntry key={`preview-leadership-${index}`} {...previewProps(item, "Organization / Activity")} />)}
       </PreviewSection>
       <PreviewSection title="Skills & Interests">
         {["technical", "language", "tools"].map((key) => {
@@ -1103,10 +1108,10 @@ function sanitizeCvData(data) {
   return {
     profile: sanitizeProfile(data.profile || {}),
     section_order: ["education", "experience", "projects", "leadership", "skills"],
-    education: (data.education || []).map(sanitizeEducationEntry).filter(isMeaningfulEducation),
-    experience: (data.experience || []).map(sanitizeExperienceEntry).filter(isMeaningfulExperience),
-    projects: (data.projects || []).map(sanitizeExperienceEntry).filter(isMeaningfulExperience),
-    leadership: (data.leadership || []).map(sanitizeExperienceEntry).filter(isMeaningfulExperience),
+    education: sortByTimelineDesc((data.education || []).map(sanitizeEducationEntry).filter(isMeaningfulEducation)),
+    experience: sortByTimelineDesc((data.experience || []).map(sanitizeExperienceEntry).filter(isMeaningfulExperience)),
+    projects: sortByTimelineDesc((data.projects || []).map(sanitizeExperienceEntry).filter(isMeaningfulExperience)),
+    leadership: sortByTimelineDesc((data.leadership || []).map(sanitizeExperienceEntry).filter(isMeaningfulExperience)),
     skills: Object.fromEntries(Object.entries(data.skills || {}).map(([key, values]) => [key, uniqueList(asList(values))])),
     interests: uniqueList(asList(data.interests)),
   };
@@ -1134,6 +1139,7 @@ function sanitizeEducationEntry(item) {
     relevant_coursework: uniqueList(item.relevant_coursework || []),
     honors: uniqueList(item.honors || []),
     bullets: cleanBullets(item.bullets),
+    _graduationMonth: item._graduationMonth,
   };
 }
 
@@ -1144,6 +1150,9 @@ function sanitizeExperienceEntry(item) {
     title: cleanText(item.title),
     dates: cleanText(item.dates),
     bullets: cleanBullets(item.bullets),
+    _startMonth: item._startMonth,
+    _endMonth: item._endMonth,
+    _isCurrent: item._isCurrent,
   };
 }
 
@@ -1502,9 +1511,88 @@ function normalizeLookupKey(value) {
     .trim();
 }
 
+const MONTH_LOOKUP = {
+  jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+  jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+  january: 1, february: 2, march: 3, april: 4, june: 6,
+  july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
+};
+
+function extractDateValue(str) {
+  if (!str) return 0;
+  const lower = String(str).toLowerCase().trim();
+  if (/present|current|now/.test(lower)) return 999999;
+
+  const ym = lower.match(/^(\d{4})-(\d{2})$/);
+  if (ym) {
+    return parseInt(ym[1], 10) * 100 + parseInt(ym[2], 10);
+  }
+
+  const my = lower.match(/([a-z]+)\s+(\d{4})/);
+  if (my && MONTH_LOOKUP[my[1]]) {
+    return parseInt(my[2], 10) * 100 + MONTH_LOOKUP[my[1]];
+  }
+
+  const y = lower.match(/\b(19|20)\d{2}\b/);
+  if (y) {
+    return parseInt(y[0], 10) * 100 + 12;
+  }
+  return 0;
+}
+
+function extractStartDateValue(datesStr) {
+  if (!datesStr) return 0;
+  const parts = String(datesStr).split(/[-–]/);
+  return extractDateValue(parts[0]);
+}
+
+function getEntryTimelineScore(entry) {
+  if (entry._isCurrent || /present|current|now/i.test(entry.dates || "")) {
+    const start = entry._startMonth ? extractDateValue(entry._startMonth) : extractStartDateValue(entry.dates);
+    return { end: 999999, start };
+  }
+
+  const dates = entry.dates || entry.graduation_date || "";
+  const parts = String(dates).split(/[-–]/);
+
+  let endScore = 0;
+  let startScore = 0;
+
+  if (parts.length === 2) {
+    startScore = extractDateValue(parts[0]);
+    endScore = extractDateValue(parts[1]);
+  } else if (parts.length === 1) {
+    endScore = extractDateValue(parts[0]);
+    startScore = endScore;
+  }
+
+  if (entry._endMonth) endScore = extractDateValue(entry._endMonth);
+  if (entry._startMonth) startScore = extractDateValue(entry._startMonth);
+  if (entry._graduationMonth) endScore = extractDateValue(entry._graduationMonth);
+
+  return { end: endScore, start: startScore };
+}
+
+function sortByTimelineDesc(entries) {
+  return [...entries].sort((a, b) => {
+    const scoreA = getEntryTimelineScore(a);
+    const scoreB = getEntryTimelineScore(b);
+    if (scoreB.end !== scoreA.end) {
+      return scoreB.end - scoreA.end;
+    }
+    return scoreB.start - scoreA.start;
+  });
+}
+
 function smartTitleCase(value) {
   const normalized = String(value || "").trim().replace(/\s+/g, " ");
   if (!normalized) return "";
+
+  // If the entire text was typed in CAPSLOCK / ALL CAPS (and contains letters), keep it as typed!
+  const hasLetters = /[A-Za-z]/.test(normalized);
+  if (hasLetters && normalized === normalized.toUpperCase()) {
+    return normalized;
+  }
 
   const acronyms = {
     binus: "BINUS",
@@ -1528,6 +1616,10 @@ function smartTitleCase(value) {
 
   let wordIndex = 0;
   return normalized.replace(/[A-Za-z0-9]+(?:'[A-Za-z0-9]+)?/g, (word) => {
+    // If the individual word was typed in ALL CAPS (length > 1), keep it! (e.g., "HR", "AWS", "PT")
+    if (word === word.toUpperCase() && /[A-Z]/.test(word) && word.length > 1) {
+      return word;
+    }
     const key = word.toLowerCase();
     const isFirstWord = wordIndex === 0;
     wordIndex += 1;
