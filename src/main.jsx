@@ -20,6 +20,7 @@ import {
   UserRound,
 } from "lucide-react";
 
+import { generateDocxBlob } from "./docxExport.js";
 import "./styles.css";
 
 const SECTION_META = [
@@ -245,31 +246,30 @@ function App() {
     const normalizedFormat = format === "pdf" ? "pdf" : "docx";
     const label = normalizedFormat.toUpperCase();
     setExportState({ status: "loading", message: `Preparing ${label}...` });
+
     try {
-      const response = await fetch(normalizedFormat === "pdf" ? "/api/export-pdf" : "/api/export", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(exportData),
-      });
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || `Server error (${response.status})`);
+      if (normalizedFormat === "pdf") {
+        setExportState({ status: "success", message: "Print dialog opened. Select 'Save as PDF'." });
+        window.print();
+        return;
       }
-      const blob = await response.blob();
+
+      // Pure client-side DOCX generation
+      const blob = await generateDocxBlob(exportData);
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.style.display = "none";
       anchor.href = url;
-      anchor.download = `${slugify(cv.profile.name || "harvard-ats-cv")}.${normalizedFormat}`;
+      anchor.download = `${slugify(cv.profile.name || "harvard-ats-cv")}.docx`;
       document.body.appendChild(anchor);
       anchor.click();
       setTimeout(() => {
         anchor.remove();
         URL.revokeObjectURL(url);
       }, 1500);
-      setExportState({ status: "success", message: `${label} downloaded.` });
+      setExportState({ status: "success", message: "DOCX downloaded." });
     } catch (error) {
-      setExportState({ status: "error", message: error.message });
+      setExportState({ status: "error", message: error.message || "Export failed." });
     }
   };
 

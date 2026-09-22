@@ -963,3 +963,71 @@ button {
     transition: none !important;
   }
 }
+
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 0.5in;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .desktop-shell {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .desktop-icons,
+  .hero-title,
+  .window-bar,
+  .form-panel,
+  .dock,
+  .ats-checks,
+  .panel-heading,
+  .export-actions,
+  .input-actions {
+    display: none !important;
+  }
+
+  .app-window {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    width: 100% !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .workspace {
+    display: block !important;
+    border: none !important;
+  }
+
+  .preview-panel {
+    border: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: transparent !important;
+  }
+
+  .resume-paper {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    background: transparent !important;
+  }
+
+  .preview-placeholder {
+    display: none !important;
+  }
+}
