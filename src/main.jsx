@@ -253,15 +253,20 @@ function App() {
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || "Export failed.");
+        throw new Error(error.error || `Server error (${response.status})`);
       }
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
+      anchor.style.display = "none";
       anchor.href = url;
       anchor.download = `${slugify(cv.profile.name || "harvard-ats-cv")}.${normalizedFormat}`;
+      document.body.appendChild(anchor);
       anchor.click();
-      URL.revokeObjectURL(url);
+      setTimeout(() => {
+        anchor.remove();
+        URL.revokeObjectURL(url);
+      }, 1500);
       setExportState({ status: "success", message: `${label} downloaded.` });
     } catch (error) {
       setExportState({ status: "error", message: error.message });
@@ -285,10 +290,15 @@ function App() {
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
+    anchor.style.display = "none";
     anchor.href = url;
     anchor.download = `${slugify(exportData.profile.name || "harvard-cv-draft")}.json`;
+    document.body.appendChild(anchor);
     anchor.click();
-    URL.revokeObjectURL(url);
+    setTimeout(() => {
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    }, 1500);
     setExportState({ status: "success", message: "Draft JSON downloaded." });
   };
 
