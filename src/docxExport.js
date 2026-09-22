@@ -190,9 +190,9 @@ function createSectionHeading(title) {
     border: {
       bottom: {
         color: "000000",
-        space: 1,
-        value: BorderStyle.SINGLE,
-        size: 6,
+        space: 2,
+        style: BorderStyle.SINGLE,
+        size: 8,
       },
     },
     children: [
